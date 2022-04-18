@@ -124,6 +124,10 @@ namespace qimg{
             delete _end;
         }
 
+        int size() const
+        {
+            return _size;
+        }
         /**
          * 尾插入一个值尾val的节点
          * @param val
@@ -133,6 +137,7 @@ namespace qimg{
             Node * node = new Node (val,_end);
             _bef_end->_next = node;
             _bef_end = node;
+            ++_size;
         }
 
         /**
@@ -147,6 +152,7 @@ namespace qimg{
                 return false;
             Node * node = new Node(val,iter->_next);
             iter->_next = node;
+            ++_size;
             return true;
         }
         /**
@@ -213,7 +219,6 @@ namespace qimg{
         q = p->_next;
         while(q != _end)
         {
-
             _keep = q->_next; //指针记录
             q->_next = p; //节点回指
 
