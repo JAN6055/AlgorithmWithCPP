@@ -2,8 +2,8 @@
 // Created by JAN on 2022/4/15.
 //
 
-#ifndef ALGORITHMWITHCPP_P3_H
-#define ALGORITHMWITHCPP_P3_H
+#ifndef ALGORITHMWITHCPP_ARRAYLIST_H
+#define ALGORITHMWITHCPP_ARRAYLIST_H
 
 #include <algorithm>
 #include <sstream>
@@ -321,4 +321,4 @@ protected:
 }   //namespace qimg end
 
 
-#endif //ALGORITHMWITHCPP_P3_H
+#endif //ALGORITHMWITHCPP_ARRAYLIST_H

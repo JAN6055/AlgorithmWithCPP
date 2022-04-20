@@ -5,7 +5,8 @@
 #ifndef ALGORITHMWITHCPP_LINKEDLIST_H
 #define ALGORITHMWITHCPP_LINKEDLIST_H
 #include <cstring>
-#include "p3.h"
+#include <ostream>
+#include "arraylist.h"
 namespace qimg{
     template <typename T> class _Node;
 
@@ -88,149 +89,155 @@ namespace qimg{
     };
 
     /**
-     * 单向链表
+     * 将链表写到流os中
      * @tparam T
+     * @param os
+     * @param list
+     * @return os(&)
      */
+    template<typename T>
+    std::ostream &operator<<(std::ostream &os, const LinkedList<T> &ls);
+
     template <typename T>
     class LinkedList
     {
-        friend class ChainIterator<T>;
     private:
         using Node = _Node<T>;
-        Node * _head;
-        Node * _bef_end;
-        Node * _end;
         int _size;
+        Node * _head;
     public:
         using iterator = ChainIterator<T>;
-        explicit LinkedList(const int n = 0)
-        : _head(new Node()), _bef_end(_head), _end(new Node()), _size(n)
-        {
-            _head->_next = _bef_end->_next = _end;
-            for(int i=0;i<n;++i)
-            {
-                push_back(T());
-            }
-        }
-
-        ~LinkedList()
-        {
-            while(_head != _end)
-            {
-                Node * next = _head->_next;
-                delete _head;
-                _head = next;
-            }
-            delete _end;
-        }
-
-        int size() const
-        {
-            return _size;
-        }
-        /**
-         * 尾插入一个值尾val的节点
-         * @param val
-         */
-        void push_back(const T & val)
-        {
-            Node * node = new Node (val,_end);
-            _bef_end->_next = node;
-            _bef_end = node;
-            ++_size;
-        }
-
-        /**
-         * 在迭代器iter后插入一个值为val的节点
-         * @param iter
-         * @param val
-         * @return
-         */
-        bool insert(iterator iter, const T & val)
-        {
-            if(iter == end())
-                return false;
-            Node * node = new Node(val,iter->_next);
-            iter->_next = node;
-            ++_size;
-            return true;
-        }
-        /**
-         * 在第一个值为_find的节点后面插入一个值为val的节点
-         * @param _find
-         * @param val
-         * @return 成功插入返回true, 否则返回false
-         */
-        bool insert(const T & _find, const T & val)
-        {
-            return insert(find(_find),val);
-        }
-        /**
-         * 获得一个头迭代器
-         * @return 一个头迭代器
-         */
-        iterator begin() const
-        {
-            return iterator (_head->_next);
-        }
-
-        /**
-         * 获得一个超尾迭代器
-         * @return 一个超尾迭代器
-         */
-        iterator end() const
-        {
-            return iterator (_end);
-        }
-
-        /**
-         * 搜索第一个值为val的节点
-         * @param val
-         * @return 如果找到，返回指向对应节点的迭代器，否则返回一个超尾迭代器
-         */
-        iterator find(const T & val)
-        {
-            auto _first = begin();
-            auto _last = end();
-            while(_first != _last)
-            {
-                if(*_first == val)
-                    return _first;
-                ++_first;
-            }
-            return _last;
-        }
+        friend std::ostream &operator<< <T>(std::ostream &os, const LinkedList &list);
+        LinkedList();
+        LinkedList(const std::initializer_list<T> & init_ls);
+        void push_front(const T & val);
+        void pop_front();
+        int size() const;
+        void output(std::ostream & os) const;
         void reserve();
+        bool empty() const { return _size == 0; }
+        iterator begin() const { return iterator (_head->_next); }
+        iterator end() const { return iterator (nullptr); }
+        ~LinkedList();
     };
 
+    template <typename T>
+    LinkedList<T>::LinkedList() : _size(0), _head(new Node(T{}, nullptr))
+    { }
+
+    template <typename T>
+    void LinkedList<T>::push_front(const T &val)
+    {
+        _head->_next = new Node(val,_head->_next);
+        ++_size;
+    }
+
     /**
-     * 对LinkedList的反转
+     * 删除链表头元素
+     * @tparam T
+     */
+    template <typename T>
+    void LinkedList<T>::pop_front()
+    {
+        Node * need = _head->_next;
+        _head->_next = need->_next;
+        need->_next = nullptr;
+        --_size;
+        delete need;
+    }
+
+    /**
+     * 使用初值列表初始化LinkedList
+     * @tparam T
+     * @param init_ls
+     */
+    template<typename T>
+    LinkedList<T>::LinkedList(const std::initializer_list<T> &init_ls)
+        : LinkedList()
+    {
+        for(auto it = rbegin(init_ls);it != rend(init_ls);++it)
+        {
+            push_front(*it);
+        }
+    }
+    /**
+     * 析构函数
+     * @tparam T
+     */
+    template <typename T>
+    LinkedList<T>::~LinkedList<T>() {
+        while(_head != nullptr)
+        {
+            Node * next = _head->_next;
+            delete _head;
+            _head = next;
+        }
+    }
+
+    /**
+     * 返回链表大小
+     * @tparam T
+     * @return
+     */
+    template<typename T>
+    inline int LinkedList<T>::size() const {
+        return _size;
+    }
+
+    /**
+     * 将链表写到流os中
+     * @tparam T
+     * @param os
+     * @return nothing
+     */
+    template <typename T>
+    void LinkedList<T>::output(std::ostream &os) const {
+        _Node<T> * node = _head->_next;
+        while(node != nullptr)
+        {
+            os << node->_element << " ";
+            node = node->_next;
+        }
+    }
+
+    /**
+     * 将链表写到流os中
+     * @tparam T
+     * @param os
+     * @param ls
+     * @return os(&)
+     */
+    template<typename T>
+    std::ostream & operator<<(std::ostream & os, const LinkedList<T> & ls)
+    {
+        ls.output(os);
+        return os;
+    }
+
+    /**
+     * 将LinkedList反转
      * @tparam T
      * @return nothing
      */
     template <typename T>
-    void LinkedList<T>::reserve()
-    {
-        Node * p; //前驱节点
-        Node * q; //回指节点
-        Node * _keep; //记录节点
-        //从真正存储数据的节点开始
-        p = _head->_next;
-        q = p->_next;
-        while(q != _end)
+    void LinkedList<T>::reserve() {
+        Node *bef, *need, *keep;
+        bef = _head->_next;
+        need = bef->_next;
+        bef->_next = nullptr;
+        keep = need;
+        while(true)
         {
-            _keep = q->_next; //指针记录
-            q->_next = p; //节点回指
-
-            p = q;  //p移动到下一个节点
-            q = _keep; //移动到下一个节点
+            if(keep == nullptr)
+                break;
+            else
+                keep = keep->_next;
+            need->_next = bef;
+            bef = need;
+            need = keep;
         }
-        Node * head_next = _head->_next;
-        _head->_next = p;
-        head_next->_next = _end;
-        _bef_end = head_next;
+        _head ->_next =  bef;
     }
-
 }   //namespace qimg end
 
 #endif //ALGORITHMWITHCPP_LINKEDLIST_H

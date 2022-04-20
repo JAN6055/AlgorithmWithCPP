@@ -405,7 +405,6 @@ namespace qimg
             for(int j=0;j<COLS;++j)
                 ans[i][j] = arr1[i][j] + arr2[i][j];
     }
-
 }   //namespace qimg end
 
 #endif //ALGORITHMWITHCPP_P2_H

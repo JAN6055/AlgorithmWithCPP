@@ -4,7 +4,7 @@
 
 #ifndef ALGORITHMWITHCPP_MULLIST_H
 #define ALGORITHMWITHCPP_MULLIST_H
-#include "p3.h"
+#include "arraylist.h"
 #include <memory>
 namespace qimg
 {
