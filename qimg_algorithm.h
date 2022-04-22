@@ -2,8 +2,8 @@
 // Created by JAN on 2022/4/15.
 //
 
-#ifndef ALGORITHMWITHCPP_P1_H
-#define ALGORITHMWITHCPP_P1_H
+#ifndef ALGORITHMWITHCPP_QIMG_ALGORITHM_H
+#define ALGORITHMWITHCPP_QIMG_ALGORITHM_H
 #include <iostream>
 #include <iterator>
 namespace qimg
@@ -419,6 +419,14 @@ void subset(bool arr[],const int n,const int i = 0)
     }
 }
 
+void hanoi(int n,char score,char target, char transit)
+{
+    if(n == 0) return;
+    hanoi(n-1, score, transit, target);
+    std::cout << score << "->" << target << std::endl;
+    hanoi(n-1,transit,target,score);
+}
+
 }   //namespace qimg end
 
-#endif //ALGORITHMWITHCPP_P1_H
+#endif //ALGORITHMWITHCPP_QIMG_ALGORITHM_H

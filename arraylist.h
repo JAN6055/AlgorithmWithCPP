@@ -9,7 +9,7 @@
 #include <sstream>
 #include <exception>
 #include <iterator>
-#include "p1.h"
+#include "qimg_algorithm.h"
 namespace qimg
 {
 /**
