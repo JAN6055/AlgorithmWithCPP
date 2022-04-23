@@ -30,6 +30,12 @@ namespace qimg{
         explicit binaryTreeNode(const T & element) : binaryTreeNode(element, nullptr, nullptr)
         { }
 
+//        void swap(const binaryTreeNode<T> & node)
+//        {
+//            using std::swap;
+//            swap(element,node.element);
+//            swap(_)
+//        }
         virtual ~binaryTreeNode() = default;
     };
 
@@ -40,7 +46,7 @@ namespace qimg{
      * @param x
      */
     template<typename T>
-    void visit(binaryTreeNode<T> * x)
+    void normal_visit(binaryTreeNode<T> * x)
     {
         std::cout << x->element <<" ";
     }
@@ -73,6 +79,7 @@ namespace qimg{
     public:
         linked_binary_tree() : root(nullptr), _size(0)
         { }
+        linked_binary_tree(const std::initializer_list<E> & ls);
         bool empty() const override { return  _size == 0; }
         int  size()  const override { return _size; }
 
@@ -107,17 +114,20 @@ namespace qimg{
             root = nullptr;
             _size = 0;
         }
-        static void (*visit)(Node *);     //打印器指针
+
+        void swap(linked_binary_tree<E> & tree) noexcept;
+        void reserve() const;
     private:
         Node * root;                      //根节点
         int _size;                        //数节点中的个数
+        static void (*visit)(Node *);     //打印器指针
         static void preOrder(Node * t);   //前序
         static void inOrder(Node * t);    //中序
         static void postOrder(Node * t);  //后序
         static void levelOrder(Node * t); //层次
-        static void add(const E & val, Node * node);
         static void dispose(Node * t) { delete t; } //删除器
         static int  height(Node * t);
+        static void reserve(Node * t);
     };
 
     /**
@@ -197,7 +207,8 @@ namespace qimg{
     }
 
     /**
-     * 向一个二叉树中添加节点---未完成的版本
+     * 向一个二叉树中添加节点
+     * 用此方法构造的二叉树为完全二叉树，用于测试，不建议使用
      * @tparam T
      * @param val
      */
@@ -205,9 +216,31 @@ namespace qimg{
     void linked_binary_tree<T>::add(const T &val) {
         if(root == nullptr){
             root = new Node(val);
+            ++_size;
             return;
         }
-        add(val,root);
+        std::deque<Node*> node_deque{ root };
+        while (true)
+        {
+            Node * node = node_deque.front();
+            if(node->_left == nullptr)
+            {
+                node->_left = new Node (val);
+                ++_size;
+                return;
+            }
+            if(node->_right == nullptr)
+            {
+                node->_right = new Node (val);
+                ++_size;
+                return;
+            }
+            if(node->_left != nullptr)
+                node_deque.push_back(node->_left);
+            if(node->_right != nullptr)
+                node_deque.push_back(node->_right);
+            node_deque.pop_front();
+        }
     }
 
     /**
@@ -240,28 +273,65 @@ namespace qimg{
     }
 
     /**
-     * 静态成员，向二叉树中添加一个节点---未完成的版本
-     * @tparam T
-     * @param val
-     * @param node 递归起始为root
-     */
-    template<typename T>
-    void linked_binary_tree<T>::add(const T &val, Node *node) {
-        if(node->_left == nullptr)
-            node->_left = new Node(val);
-        else if(node->_right == nullptr)
-            node->_right = new Node (val);
-        else
-            add(val, node->_left);
-    }
-
-    /**
      * 初始化静态数据成员 visit
      * @tparam T
      */
     template<typename T>
-    void(* linked_binary_tree<T>::visit)(binaryTreeNode<T> *) = nullptr;
+    void(* linked_binary_tree<T>::visit)(binaryTreeNode<T> *) = qimg::normal_visit;
 
-}
+    /**
+     * 交换两个二叉树
+     * @tparam T
+     * @param tree
+     */
+    template<typename T>
+    void linked_binary_tree<T>::swap(linked_binary_tree<T> & tree) noexcept
+    {
+        std::swap(root, tree.root);
+    }
+
+    /**
+     * 列表初始一个层次遍历为迭代列表结果的完全二叉树
+     * @tparam T
+     * @param ls
+     */
+    template<typename T>
+    linked_binary_tree<T>::
+            linked_binary_tree(const std::initializer_list<T> &ls)
+    : linked_binary_tree()
+    {
+        for (const auto &item: ls) {
+            add(item);
+        }
+    }
+
+    /**
+     * 静态方法，交换t树每个节点的左右子树 --- bug所有的叶子节点不会的到交换
+     * @tparam T
+     * @param t
+     */
+    template<typename T>
+    void linked_binary_tree<T>::reserve(Node *t) {
+        if(t == nullptr) return;
+        if(t->_left != nullptr)
+            reserve(t->_left);
+        if(t->_right != nullptr)
+            reserve(t->_left);
+        using namespace std;
+        if(t->_left != nullptr || t->_right != nullptr)
+            std::swap(t->_right,t->_left);
+
+    }
+
+    /**
+     * 成员函数，交换每个节点的左右子树
+     * @tparam T
+     */
+    template<typename T>
+    void linked_binary_tree<T>::reserve() const {
+        if(root == nullptr) return;
+        linked_binary_tree<T>::reserve(root);
+    }
+}   //namespace qimg end
 
 #endif //ALGORITHMWITHCPP_BINARY_TREE_H
