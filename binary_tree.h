@@ -30,12 +30,6 @@ namespace qimg{
         explicit binaryTreeNode(const T & element) : binaryTreeNode(element, nullptr, nullptr)
         { }
 
-//        void swap(const binaryTreeNode<T> & node)
-//        {
-//            using std::swap;
-//            swap(element,node.element);
-//            swap(_)
-//        }
         virtual ~binaryTreeNode() = default;
     };
 
